@@ -1,3 +1,4 @@
+# 1. Network Interface Configuration
 resource "azurerm_network_interface" "main" {
   name                = "${var.component_name}-${var.env}-nic"
   location            = data.azurerm_resource_group.main.location
@@ -10,6 +11,33 @@ resource "azurerm_network_interface" "main" {
   }
 }
 
+# 2. Network Security Group Definition
+resource "azurerm_network_security_group" "main" {
+  name                = "${var.component_name}-${var.env}-nsg"
+  location            = data.azurerm_resource_group.main.location
+  resource_group_name = data.azurerm_resource_group.main.name
+
+  # Security Rule allowing SSH management access
+  security_rule {
+    name                       = "Allow-SSH"
+    priority                   = 100
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "22"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
+}
+
+# 3. Associate the NSG to the Network Interface
+resource "azurerm_network_interface_security_group_association" "main" {
+  network_interface_id      = azurerm_network_interface.main.id
+  network_security_group_id = azurerm_network_security_group.main.id
+}
+
+# 4. Linux Virtual Machine Configuration
 resource "azurerm_linux_virtual_machine" "main" {
   name                            = "${var.component_name}-${var.env}"
   location                        = data.azurerm_resource_group.main.location
@@ -24,12 +52,12 @@ resource "azurerm_linux_virtual_machine" "main" {
   vtpm_enabled                    = true
 
   os_disk {
-
     caching              = "ReadWrite"
     storage_account_type = "Standard_LRS"
   }
 }
 
+# 5. DNS Record Mapping
 resource "azurerm_dns_a_record" "main" {
   name                = "${var.component_name}-${var.env}"
   zone_name           = "piple.site"
