@@ -6,7 +6,7 @@ resource "azurerm_network_interface" "main" {
 
   ip_configuration {
     name                          = "${var.component_name}-${var.env}-nic${count.index}"
-    subnet_id                     = "/subscriptions/67d6c4c6-913c-4f47-b3e1-eab7b50d229d/resourceGroups/Nothing/providers/Microsoft.Network/virtualNetworks/vnet-denmarkeast-2"
+    subnet_id                     = "/subscriptions/67d6c4c6-913c-4f47-b3e1-eab7b50d229d/resourceGroups/Nothing/providers/Microsoft.Network/virtualNetworks/vnet-denmarkeast-1/subnets/snet-denmarkeast-1"
     private_ip_address_allocation = "Dynamic"
   }
 }
@@ -74,7 +74,8 @@ resource "azurerm_lb_backend_address_pool_address" "main" {
   name                    = "${var.component_name}-${var.env}-${count.index}"
   backend_address_pool_id = azurerm_lb_backend_address_pool.main[0].id
   ip_address              = azurerm_network_interface.main[count.index].private_ip_address
-  virtual_network_id      = "/subscriptions/67d6c4c6-913c-4f47-b3e1-eab7b50d229d/resourceGroups/Nothing/providers/Microsoft.Network/virtualNetworks/vnet-denmarkeast-2"
+  virtual_network_id      = "/subscriptions/67d6c4c6-913c-4f47-b3e1-eab7b50d229d/resourceGroups/Nothing/providers/Microsoft.Network/virtualNetworks/vnet-denmarkeast-1/subnets/snet-denmarkeast-1"
+  # "/subscriptions/67d6c4c6-913c-4f47-b3e1-eab7b50d229d/resourceGroups/Nothing/providers/Microsoft.Network/virtualNetworks/vnet-denmarkeast-2"
 
 }
 
